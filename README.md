@@ -11,8 +11,6 @@ Click on the latest release
 
 [(or here)](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases)
 
-
-</br>
 Then click on 
 
 [mods-manager.exe](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases/download/1.0/mods-manager.exe) for downloading it
