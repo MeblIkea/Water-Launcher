@@ -145,7 +145,6 @@ window = sg.Window('Mods Manager', mod_manager, default_element_size=(12, 1), si
 
 while True:
     event, values = window.read()
-    print(event, values)
     window.set_title(values.get(0))
     # Change theme
     if event == 'Set themes':
@@ -163,12 +162,10 @@ while True:
             if os.path.isfile(rf'{settings.get("lls_dir")}\BepInEx\config\{mod_name}.cfg'):
                 os.remove(rf'{settings.get("lls_dir")}\BepInEx\config\{mod_name}.cfg')
         window['Mods_list'].update(mods_installed)
-    print(mods_installed)
     # Selected mod
     if values.get('Mods_list') != []:
         mod_name = mods_installed[values.get('Mods_list')[0]][0]
         window['Selected_label'].update(mod_name)
-        print(main_mod_install)
         if main_mod_install is True:
             window['Mod_install'].update(disabled=False)
             window['Mod_description'].update(disabled=False)
