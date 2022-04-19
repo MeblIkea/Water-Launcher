@@ -1,6 +1,6 @@
 <h1> Water Launcher! </h1>
 
-This is a simple software for managing more easily [Moojuiceman's mods](https://github.com/Moojuiceman-LSMods), so this is <b>NOT</b> my mods.
+This is a simple software for managing Landlord's Super mods [(Moojuiceman's mods)](https://github.com/Moojuiceman-LSMods), so this is <b>NOT</b> my mods.
 </br>
 This is a portable software.
 In case of any problems, please go to [Minskwork's Discord](https://discord.gg/A253AkJ2qv) to report it.
