@@ -1,4 +1,4 @@
-<h1> Landlord's Super Mod Manager </h1>
+<h1> Water Launcher! </h1>
 
 This is a simple software for managing more easily [Moojuiceman's mods](https://github.com/Moojuiceman-LSMods), so this is <b>NOT</b> my mods.
 </br>
