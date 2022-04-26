@@ -1,24 +1,28 @@
 import PySimpleGUI as sg
+from PySimpleGUI import TABLE_SELECT_MODE_BROWSE
+import urllib.request
+from urllib.request import urlopen
+from io import BytesIO
+from zipfile import ZipFile
 import os
+import sys
 import webbrowser
 import shutil
 import json
 import textwrap
 import requests
-import urllib.request
-from urllib.request import urlopen
-from io import BytesIO
-from zipfile import ZipFile
-from PySimpleGUI import TABLE_SELECT_MODE_BROWSE
-
+print('============SETUP...============')
 global setup
 
 # Get settings
 meb_folder = os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\Meb')
 if not os.path.isdir(meb_folder):
+    print('Settings not founded, creating settings')
     os.mkdir(meb_folder)
     meb_folder = meb_folder + r'\LandlordsSuper'
     os.mkdir(meb_folder)
+    urllib.request.urlretrieve('https://raw.githubusercontent.com/MeblIkea/Water-Launcher/main/logo.ico',
+                               rf'{meb_folder}\icon.ico')
     with open(rf'{meb_folder}\settings.json', 'w') as file:
         settings = {'lls_dir': None, 'theme': 'DefaultNoMoreNagging'}
         json.dump(settings, file)
@@ -28,34 +32,12 @@ else:
         settings = json.load(file)
 
 sg.theme(settings.get('theme'))
-
-
-# Setup
-
-# Set themes function
-def set_theme():
-    global settings
-    theme_layout = [[sg.Button('List themes')],
-                    [sg.Text('Put your theme name here:')],
-                    [sg.Input('', key='Theme_input')],
-                    [sg.Button('Set theme'), sg.Text('', key='Theme_error')],
-                    [sg.Button('Close')]]
-    theme_window = sg.Window('Theme selector', theme_layout, size=(480, 160))
-    while True:
-        event, values = theme_window.read()
-        if event == 'List themes':
-            sg.theme_previewer()
-        if event == 'Set theme':
-            if theme_window['Theme_input'].get() in sg.theme_list():
-                with open(rf'{meb_folder}\settings.json', 'w') as file:
-                    settings = {'lls_dir': settings.get('lls_dir'), 'theme': theme_window['Theme_input'].get()}
-                    json.dump(settings, file)
-                theme_window['Theme_error'].update("Theme set, now you can restart the app", text_color='lime')
-            else:
-                theme_window['Theme_error'].update("This theme don't exist", text_color='red')
-        if event == sg.WIN_CLOSED or event == 'Close':
-            theme_window.close()
-            break
+sg.SetGlobalIcon(rf'{meb_folder}\icon.ico')
+print('Settings loaded\nTheme set\nGetting Latest infos')
+infos = requests.get('https://pastebin.com/raw/YyDne6X9').json()
+version = "1.1"
+win_y = 209
+print(f'Latest: {infos.get("version")}, Current: {version}')
 
 
 # Setup Layout & Setup
@@ -65,6 +47,7 @@ setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press defa
                 [sg.Button('Set', disabled=True, key='Set'), sg.Button('Close')]]
 
 if settings.get('lls_dir') is None:
+    print('Launching Setup')
     setup = sg.Window('Setup', setup_layout, size=(480, 160))
     while setup:
         event, values = setup.read()
@@ -91,14 +74,20 @@ if settings.get('lls_dir') is None:
                 setup.close()
                 break
         if event == sg.WIN_CLOSED or event == 'Close':
-            exit()
+            sys.exit()
 
 # Get mods names & download links
+print('-Getting Mods')
 mods = {}
-for x in requests.get('https://api.github.com/users/Moojuiceman-LSMods/repos').json():
+mods_requests = requests.get('https://api.github.com/users/Moojuiceman-LSMods/repos').json()
+for x in mods_requests:
     description = requests.get(f'https://raw.githubusercontent.com/Moojuiceman-LSMods/{x.get("name")}/master/README.md')
     description = description.text.split('#### ')[1].replace('What it does\n\n', '')
     description = textwrap.fill(description, 54)
+    if x == mods_requests[len(mods_requests)-1]:
+        print(f'  └--→ {x.get("name")}')
+    else:
+        print(f'  ├--→ {x.get("name")}')
     mods[x.get('name')] = {'dl_url': f'https://github.com/Moojuiceman-LSMods/{x.get("name")}/releases/latest/download'
                                      f'/{x.get("name")}.dll', 'description': description}
 
@@ -116,6 +105,7 @@ else:
          sg.Text('Waiting...', key='state')],
         [sg.Button('Uninstall', key='Uninstall_main_mod', disabled=True)]]
     main_mod_install = False
+print(f'Main mod install: {main_mod_install}')
 
 # Check if some mods are already install
 mods_installed = []
@@ -126,6 +116,16 @@ for x in mods:
         mods_installed.append([x, 'No'])
 
 # Menus
+
+if version == infos.get('version'):
+    stbar = sg.Text('')
+    print('Menu is updated')
+else:
+    stbar = sg.StatusBar(f'*OUTDATED* Current version: {version}, Latest version: {infos.get("version")}',
+                         text_color='red', enable_events=True, key='outdated_clicked')
+    win_y += 18
+    print('Menu is outdated')
+
 mod_browser = [
     [sg.Col([[sg.Table(mods_installed, ['Mod name', 'Is Installed'], auto_size_columns=True, enable_events=True,
                        key='Mods_list', select_mode=TABLE_SELECT_MODE_BROWSE, justification='left')]]),
@@ -134,24 +134,58 @@ mod_browser = [
              [sg.Button('Description', key='Mod_description', disabled=True)],
              [sg.Button('Install', key='Mod_install', disabled=True)]])]]
 
-mod_manager = [[sg.MenubarCustom([['Themes', ['Set themes']], ['About', ["Minskworks Discord", 'Original Mod Repo',
-                                                                         'Mod Manager Repo']]])],
+mod_manager = [[sg.MenubarCustom([['Main', ['Play!', 'Reset this software', 'Exit']], ['Themes', ['Manage Themes']],
+                                  ['About', ["Minskworks Discord", "Moojuiceman's Repo", 'Water Launcher Repo']]])],
                [sg.TabGroup([[sg.Tab('Main Mod', install_mod), sg.Tab('Browser Mods', mod_browser,
                                                                       key='Browse-mod_tab')]],
                             size=(480, 130))],
-               [sg.Button('Exit')]]
+               [stbar]]
 
-window = sg.Window('Mods Manager', mod_manager, default_element_size=(12, 1), size=(500, 240))
+window = sg.Window('Water Launcher!', mod_manager, default_element_size=(12, 1), size=(500, win_y))
+print('Layouts sets\n\n============LAUNCHING...============')
 
 while True:
     event, values = window.read()
-    try:
-        window.set_title(values.get(0))
-    except:
-        pass
+    print(event, values)
+    window.set_title(values.get(0))
+    # Game tab
+    if event == 'Reset this software':
+        shutil.rmtree(os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\Meb'))
+        rs_software = sg.Window('Software has been resetted!', [[sg.Text('This software has been resetted.')],
+                                                                [sg.Text('You can close this window!')]],
+                                size=(200, 75))
+        rs_software.read()
+        rs_software.close()
+        sys.exit()
+    if event == 'Play!':
+        os.popen(rf'{settings.get("lls_dir")}\LandlordsSuper.exe')
+
+    # If outdated clicked
+    if event == 'outdated_clicked':
+        webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
     # Change theme
-    if event == 'Set themes':
-        set_theme()
+    if event == 'Manage Themes':
+        theme_layout = [[sg.Text('Put your theme name here:')],
+                        [sg.Input('', key='Theme_input')],
+                        [sg.Button('Set theme'), sg.Button('List themes'), sg.Text('', key='Theme_error')],
+                        [sg.Button('Close')]]
+        theme_window = sg.Window('Theme selector', theme_layout, size=(480, 130))
+        while True:
+            values: object
+            event, values = theme_window.read()
+            if event == 'List themes':
+                sg.theme_previewer()
+            if event == 'Set theme':
+                if theme_window['Theme_input'].get() in sg.theme_list():
+                    with open(rf'{meb_folder}\settings.json', 'w') as file:
+                        settings = {'lls_dir': settings.get('lls_dir'), 'theme': theme_window['Theme_input'].get()}
+                        json.dump(settings, file)
+                    theme_window['Theme_error'].update("Theme set, now you can close the window", text_color='lime')
+                else:
+                    theme_window['Theme_error'].update("This theme don't exist", text_color='red')
+            if event == sg.WIN_CLOSED or event == 'Close':
+                theme_window.close()
+                sys.exit()
     # Install mod
     if event == 'Mod_install':
         mod_name = mods_installed[values.get('Mods_list')[0]][0]
@@ -160,13 +194,15 @@ while True:
             urllib.request.urlretrieve(url, rf'{settings.get("lls_dir")}\BepInEx\plugins\{mod_name}.dll')
             mods_installed[values.get('Mods_list')[0]] = [mod_name, 'Yes']
             window['Mod_install'].update('Remove')
-        else:  # Remove Mod
+    # Remove Mod
+        else:
             os.remove(rf'{settings.get("lls_dir")}\BepInEx\plugins\{mod_name}.dll')
             if os.path.isfile(rf'{settings.get("lls_dir")}\BepInEx\config\{mod_name}.cfg'):
                 os.remove(rf'{settings.get("lls_dir")}\BepInEx\config\{mod_name}.cfg')
+            mods_installed[values.get('Mods_list')[0]] = [mod_name, 'No']
         window['Mods_list'].update(mods_installed)
     # Selected mod
-    if values.get('Mods_list') != []:
+    if len(values.get('Mods_list')) != 0:
         mod_name = mods_installed[values.get('Mods_list')[0]][0]
         window['Selected_label'].update(mod_name)
         if main_mod_install is True:
@@ -227,8 +263,8 @@ while True:
     if event == "Moojuiceman's Repo":
         webbrowser.open('https://github.com/orgs/Moojuiceman-LSMods/repositories')
     if event == 'Mod Manager Repo':
-        webbrowser.open('https://github.com/MeblIkea/Landlords-Super-Mod-Manager')
+        webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
     # Exit
     if event == sg.WIN_CLOSED or event == 'Exit':
         window.close()
-        break
+        sys.exit()
