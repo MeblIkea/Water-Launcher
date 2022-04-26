@@ -15,7 +15,7 @@ Click on the latest release
 
 Then click on 
 
-[mods-manager.exe](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases/download/1.0/mods-manager.exe) for downloading it
+[Water.Launcher.exe](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases/download/1.0/mods-manager.exe) for downloading it
 
 Now, you can launch it.
 
@@ -46,4 +46,20 @@ Click "Browse mods", and then, you can see every mods for Landlord's Super, and 
 </br>
 </br>
 </br>
+
+<h1>Updates:</h1>
+
+1.0.1
+------
+
+### ---FEATURES---
+* New name & logo!
+* UI rework
+
+### ---FIXES---
+* exit() was not recognised by py-to-exe (so I just change it by sys.exit())
+* The button for going to @Moojuiceman-LSMods repo wasn't working (just a mistake in the keys)
+* When you remove a mod, it was always showed as install on the list (because it wasn't update)
+
+<br></br>
 Also, sorry for spelling and grammar mistakes, my English is kinda bad, have fun ^^
