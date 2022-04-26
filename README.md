@@ -56,9 +56,10 @@ Click "Browse mods", and then, you can see every mods for Landlord's Super, and 
 ### ---FEATURES---
 * New name & logo!
 * UI rework
+* Now, you'll know when there is a new update!
 
 ### ---FIXES---
-* exit() was not recognised by py-to-exe (so I just change it by sys.exit())
+* exit() was not recognised by py-to-exe, and that causes huge problems (so I just change it by sys.exit())
 * The button for going to @Moojuiceman-LSMods repo wasn't working (just a mistake in the keys)
 * When you remove a mod, it was always showed as install on the list (because it wasn't update)
 
