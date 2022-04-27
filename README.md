@@ -6,8 +6,7 @@ This is a portable software.
 In case of any problems, please go to [Minskwork's Discord](https://discord.gg/A253AkJ2qv) to report it.
 #### <b> LANDLORD'S SUPER STEAM EDITION IS REQUIRED </b>
 
-![image](https://cdn.discordapp.com/attachments/959455191718051961/964922543502925914/unknown.png?size=4096)*This is an old picture, it is no longer representative.*
-
+![image](https://cdn.discordapp.com/attachments/874630293401763880/968773591883730954/unknown.png)
 <h2> Installation </h2>
 Click on the latest release 
 
