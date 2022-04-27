@@ -17,7 +17,7 @@ Then click on
 [Water.Launcher.exe](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases/download/1.0/mods-manager.exe) for downloading it
 
 Now, you can launch it.<br>
-/!\ Windows detect the new version as a virus (I'll try to fix this problem in a couple of days)
+/!\ Windows can detect the new version as a virus (I'll try to fix this problem in a couple of days)
 
 <h2> Setup </h2>
 When you see the setup window, you have to put your Landlord's Super directory (press "Default" if it is always in default Steam location)
