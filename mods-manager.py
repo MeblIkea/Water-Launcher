@@ -11,6 +11,7 @@ import shutil
 import json
 import textwrap
 import requests
+
 print('============SETUP...============')
 global setup
 
@@ -38,7 +39,6 @@ infos = requests.get('https://pastebin.com/raw/YyDne6X9').json()
 version = "1.1"
 win_y = 209
 print(f'Latest: {infos.get("version")}, Current: {version}')
-
 
 # Setup Layout & Setup
 setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press default if not changed)")],
@@ -84,7 +84,7 @@ for x in mods_requests:
     description = requests.get(f'https://raw.githubusercontent.com/Moojuiceman-LSMods/{x.get("name")}/master/README.md')
     description = description.text.split('#### ')[1].replace('What it does\n\n', '')
     description = textwrap.fill(description, 54)
-    if x == mods_requests[len(mods_requests)-1]:
+    if x == mods_requests[len(mods_requests) - 1]:
         print(f'  └--→ {x.get("name")}')
     else:
         print(f'  ├--→ {x.get("name")}')
@@ -147,7 +147,12 @@ print('Layouts sets\n\n============LAUNCHING...============')
 while True:
     event, values = window.read()
     print(event, values)
-    window.set_title(values.get(0))
+    # Exit
+    if event == sg.WIN_CLOSED or event == 'Exit' or event is None:
+        window.close()
+        sys.exit()
+
+    window.set_title(values.get(0))  # Set good window title
     # Game tab
     if event == 'Reset this software':
         shutil.rmtree(os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\Meb'))
@@ -194,7 +199,7 @@ while True:
             urllib.request.urlretrieve(url, rf'{settings.get("lls_dir")}\BepInEx\plugins\{mod_name}.dll')
             mods_installed[values.get('Mods_list')[0]] = [mod_name, 'Yes']
             window['Mod_install'].update('Remove')
-    # Remove Mod
+        # Remove Mod
         else:
             os.remove(rf'{settings.get("lls_dir")}\BepInEx\plugins\{mod_name}.dll')
             if os.path.isfile(rf'{settings.get("lls_dir")}\BepInEx\config\{mod_name}.cfg'):
@@ -264,7 +269,3 @@ while True:
         webbrowser.open('https://github.com/orgs/Moojuiceman-LSMods/repositories')
     if event == 'Mod Manager Repo':
         webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
-    # Exit
-    if event == sg.WIN_CLOSED or event == 'Exit':
-        window.close()
-        sys.exit()
