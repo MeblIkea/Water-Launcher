@@ -14,7 +14,7 @@ Click on the latest release
 
 Then click on 
 
-[Water.Launcher.exe](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases/download/1.0/mods-manager.exe) for downloading it
+[Water.Launcher.exe](https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.exe) for downloading it
 
 Now, you can launch it.<br>
 /!\ Windows can detect the new version as a virus (I'll try to fix this problem in a couple of days)
