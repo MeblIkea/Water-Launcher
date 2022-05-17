@@ -50,7 +50,8 @@ Click "Browse mods", and then, you can see every mods for Landlord's Super, and 
 | Windows 11  | Untested  |  -  |  -  |
 | Windows 10 (x64)  | Yes  |  1.0.1  |  -  |
 | Windows 8  | Untested  |  -   |  -  |
-| Windows 7 (x86)  | No  |  1.0.1  |  32 bits non-compatible  |
+| Windows 7 (x64)  | <a href="https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.For.Win.7.and.newer.zip">Yes (with Win7 specific version) </a> |  1.0.1  |  -  |
+| Windows 7 (x86)  | No  |  1.0.1  |  SSL Certificat Error  |
 | Windows XP (x64) | No  |  1.0.1  |  Couldn't locate library COMCTL32.dll  |
 
 (all this tests are made with fresh installations, without having Python installed)
