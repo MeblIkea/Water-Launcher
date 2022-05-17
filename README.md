@@ -43,6 +43,18 @@ Click "Browse mods", and then, you can see every mods for Landlord's Super, and 
 </br>
 </br>
 
+<h2>Compatibilities</h2>
+
+| OS | Is compatible | Tested on version |
+| ------------- | ------------- | ------------- |
+| Windows 11  | Untested  |  -  |
+| Windows 10 (x64)  | Yes  |  1.0.1  |
+| Windows 8  | Untested  |  -   |
+| Windows 7  | Untested  |  -  |
+| Windows XP (x64) | No  |  1.0.1  |
+
+(all this tests are made with fresh installations, without having Python installed)
+
 <h1>Updates:</h1>
 
 1.0.1
