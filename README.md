@@ -51,7 +51,7 @@ Click "Browse mods", and then, you can see every mods for Landlord's Super, and 
 | Windows 10 (x64)  | Yes  |  1.0.1  |  -  |
 | Windows 8  | Untested  |  -   |  -  |
 | Windows 7 (x32)  | No  |  1.0.1  |  32 bits non-compatible  |
-| Windows XP (x64) | No  |  1.0.1  |  "Couldn't locate library COMCTL32.dll"  |
+| Windows XP (x64) | No  |  1.0.1  |  Couldn't locate library COMCTL32.dll  |
 
 (all this tests are made with fresh installations, without having Python installed)
 
