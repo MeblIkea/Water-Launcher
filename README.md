@@ -1,20 +1,16 @@
 <h1> Water Launcher! </h1>
 
-This is a simple software for managing Landlord's Super mods [(Moojuiceman's mods)](https://github.com/Moojuiceman-LSMods), so this is <b>NOT</b> my mods.
+This is a simple software for managing Landlord's Super mods <a href="https://github.com/Moojuiceman-LSMods">Moojuiceman's mods</a>, so this is <b>NOT</b> my mods.
 </br>
 This is a portable software.
-In case of any problems, please go to [Minskwork's Discord](https://discord.gg/A253AkJ2qv) to report it.
+In case of any problems, please go to <a href="https://discord.gg/A253AkJ2qv">Minskwork's Discord</a> to report it.
 #### <b> LANDLORD'S SUPER STEAM EDITION IS REQUIRED </b>
 
-![image](https://cdn.discordapp.com/attachments/874630293401763880/968773591883730954/unknown.png)
+<img src="https://cdn.discordapp.com/attachments/874630293401763880/968773591883730954/unknown.png">
 <h2> Installation </h2>
-Click on the latest release 
-
-[(or here)](https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases)
-
-Then click on 
-
-[Water.Launcher.exe](https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.exe) for downloading it
+Click on the latest release <a href="https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases">(or here)</a>
+</br>
+Then click on <a href="https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.exe">Water.Launcher.exe</a> for downloading it
 
 Now, you can launch it.<br>
 /!\ Windows can detect the new version as a virus (I'll try to fix this problem in a couple of days)
