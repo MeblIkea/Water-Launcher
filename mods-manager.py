@@ -11,6 +11,8 @@ import shutil
 import json
 import textwrap
 import requests
+import vdf
+import winreg
 
 print('============SETUP...============')
 global setup
@@ -52,8 +54,17 @@ if settings.get('lls_dir') is None:
     while setup:
         event, values = setup.read()
         if event == 'Default':
-            setup['Directory'].update(r"C:\Program Files (x86)\Steam\steamapps\common\Landlord's Super")
-            values['Directory'] = r"C:\Program Files (x86)\Steam\steamapps\common\Landlord's Super"
+            values['Directory'] = ""
+            _hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
+            _steampath, _steampathtype = winreg.QueryValueEx( _hkcu_steam, "SteamPath" )
+            winreg.CloseKey( _hkcu_steam )
+            if _steampathtype == winreg.REG_SZ:
+                _lfvdf = open( os.path.join( _steampath, 'config', 'libraryfolders.vdf' ) )
+                _libraryfolders = vdf.load( _lfvdf )
+                for key in _libraryfolders['libraryfolders']:
+                    if '1127840' in _libraryfolders['libraryfolders'][key]['apps']:
+                        values['Directory'] = os.path.join( _libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common', "Landlord's Super")
+           setup['Directory'].update(values['Directory'])
         try:
             if os.path.isfile(rf"{values.get('Directory')}\LandlordsSuper.exe"):
                 setup['Dir_adv'].update("This directory exist, and is Landlord's Super", text_color='lime')
