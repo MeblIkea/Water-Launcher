@@ -64,7 +64,7 @@ if settings.get('lls_dir') is None:
                 for key in _libraryfolders['libraryfolders']:
                     if '1127840' in _libraryfolders['libraryfolders'][key]['apps']:
                         values['Directory'] = os.path.join( _libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common', "Landlord's Super")
-           setup['Directory'].update(values['Directory'])
+            setup['Directory'].update(values['Directory'])
         try:
             if os.path.isfile(rf"{values.get('Directory')}\LandlordsSuper.exe"):
                 setup['Dir_adv'].update("This directory exist, and is Landlord's Super", text_color='lime')
