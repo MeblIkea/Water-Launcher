@@ -32,18 +32,10 @@ try:
 except:
     from collections import Mapping
 
-# Py2 & Py3 compatibility
-if sys.version_info[0] >= 3:
-    BOMS = '\ufffe\ufeff'
+BOMS = '\ufffe\ufeff'
 
-    def strip_bom(line):
-        return line.lstrip(BOMS)
-else:
-    BOMS = '\xef\xbb\xbf\xff\xfe\xfe\xff'
-    BOMS_UNICODE = '\\ufffe\\ufeff'.decode('unicode-escape')
-
-    def strip_bom(line):
-        return line.lstrip(BOMS if isinstance(line, str) else BOMS_UNICODE)
+def strip_bom(line):
+    return line.lstrip(BOMS)
 
 # string escaping
 _unescape_char_map = {
