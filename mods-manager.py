@@ -38,7 +38,7 @@ sg.theme(settings.get('theme'))
 sg.SetGlobalIcon(rf'{meb_folder}\icon.ico')
 print('Settings loaded\nTheme set\nGetting Latest infos')
 infos = requests.get('https://pastebin.com/raw/YyDne6X9').json()
-version = "1.0.1 ('1.1' is not latest)"
+version = "1.2.0"
 win_y = 209
 print(f'Latest: {infos.get("version")}, Current: {version}')
 
