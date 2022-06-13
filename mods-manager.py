@@ -48,22 +48,37 @@ setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press defa
                 [sg.Button('Default'), sg.Text("This directory don't exist", key='Dir_adv', text_color='red')],
                 [sg.Button('Set', disabled=True, key='Set'), sg.Button('Close')]]
 
+def find_steam_lls():
+    lls_dir = None
+    _hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
+    _steampath, _steampathtype = winreg.QueryValueEx( _hkcu_steam, "SteamPath" )
+    winreg.CloseKey( _hkcu_steam )
+    if _steampathtype == winreg.REG_SZ:
+        _lfvdf = open( os.path.join( _steampath, 'config', 'libraryfolders.vdf' ) )
+        _libraryfolders = vdf.parse( _lfvdf )
+        for key in _libraryfolders['libraryfolders']:
+            if '1127840' in _libraryfolders['libraryfolders'][key]['apps']:
+                lls_dir = os.path.join( _libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common', "Landlord's Super")
+    return lls_dir
+
+# Don't prompt for the directory if the Steam Library scan works, cleaner startup
+if settings.get('lls_dir') is None:
+    print('Checking Steam location')
+
+    _lls_dir = find_steam_lls()
+    if _lls_dir is not None:
+        if os.path.isfile(rf"{_lls_dir}\LandlordsSuper.exe"):
+            with open(rf'{meb_folder}\settings.json', 'w') as file:
+                settings = {'lls_dir': _lls_dir, 'theme': settings.get('theme')}
+                json.dump(settings, file)
+
 if settings.get('lls_dir') is None:
     print('Launching Setup')
     setup = sg.Window('Setup', setup_layout, size=(480, 160))
     while setup:
         event, values = setup.read()
         if event == 'Default':
-            values['Directory'] = ""
-            _hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
-            _steampath, _steampathtype = winreg.QueryValueEx( _hkcu_steam, "SteamPath" )
-            winreg.CloseKey( _hkcu_steam )
-            if _steampathtype == winreg.REG_SZ:
-                _lfvdf = open( os.path.join( _steampath, 'config', 'libraryfolders.vdf' ) )
-                _libraryfolders = vdf.parse( _lfvdf )
-                for key in _libraryfolders['libraryfolders']:
-                    if '1127840' in _libraryfolders['libraryfolders'][key]['apps']:
-                        values['Directory'] = os.path.join( _libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common', "Landlord's Super")
+            values['Directory'] = find_steam_lls() or ""
             setup['Directory'].update(values['Directory'])
         try:
             if os.path.isfile(rf"{values.get('Directory')}\LandlordsSuper.exe"):
