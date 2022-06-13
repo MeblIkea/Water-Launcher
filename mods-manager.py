@@ -60,7 +60,7 @@ if settings.get('lls_dir') is None:
             winreg.CloseKey( _hkcu_steam )
             if _steampathtype == winreg.REG_SZ:
                 _lfvdf = open( os.path.join( _steampath, 'config', 'libraryfolders.vdf' ) )
-                _libraryfolders = vdf.load( _lfvdf )
+                _libraryfolders = vdf.parse( _lfvdf )
                 for key in _libraryfolders['libraryfolders']:
                     if '1127840' in _libraryfolders['libraryfolders'][key]['apps']:
                         values['Directory'] = os.path.join( _libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common', "Landlord's Super")
