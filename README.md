@@ -48,28 +48,13 @@ Click "Browse mods", and then, you can see every mods for Landlord's Super, and 
 | OS | Is compatible | Tested on version | Error |
 | ------------- | ------------- | ------------- | ------------- |
 | Windows 11  | Untested  |  -  |  -  |
-| Windows 10 (x64)  | Yes  |  1.0.1  |  -  |
+| Windows 10 (x64)  | Yes  |  1.0.2  |  -  |
 | Windows 8  | Untested  |  -   |  -  |
 | Windows 7 (x64)  | <a href="https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.For.Win.7.and.newer.zip">Yes (with Win7 specific version) </a> |  1.0.1  |  -  |
-| Windows 7 (x86)  | No  |  1.0.1  |  SSL Certificat Error  |
+| Windows 7 (x86)  | No  |  1.0.2  |  SSL Certificat Error  |
 | Windows XP (x64) | No  |  1.0.1  |  Couldn't locate library COMCTL32.dll  |
 
 (all this tests are made with fresh installations, without having Python installed)
-
-<h1>Updates:</h1>
-
-1.0.1
-------
-
-### ---FEATURES---
-* New name & logo!
-* UI rework
-* Now, you'll know when there is a new update!
-
-### ---FIXES---
-* exit() was not recognised by py-to-exe, and that causes huge problems (so I just change it by sys.exit())
-* The button for going to @Moojuiceman-LSMods repo wasn't working (just a mistake in the keys)
-* When you remove a mod, it was always showed as install on the list (because it wasn't update)
 
 <br></br>
 Also, sorry for spelling and grammar mistakes, my English is kinda bad, have fun ^^
