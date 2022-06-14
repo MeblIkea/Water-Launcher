@@ -6,7 +6,7 @@ This is a portable software.
 In case of any problems, please go to <a href="https://discord.gg/A253AkJ2qv">Minskwork's Discord</a> to report it.
 #### <b> LANDLORD'S SUPER STEAM EDITION IS REQUIRED </b>
 
-<img src="https://cdn.discordapp.com/attachments/874630293401763880/968773591883730954/unknown.png">
+<img src="https://cdn.discordapp.com/attachments/897896186487390218/986285826189193267/unknown.png">
 <h2> Installation </h2>
 Click on the latest release <a href="https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases">(or here)</a>
 </br>
