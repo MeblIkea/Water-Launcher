@@ -338,3 +338,4 @@ while True:
         webbrowser.open('https://github.com/orgs/Moojuiceman-LSMods/repositories')
     if event == 'Mod Manager Repo':
         webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
+ 
