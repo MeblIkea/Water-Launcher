@@ -5,16 +5,19 @@ import urllib.error
 from urllib.request import urlopen
 from io import BytesIO
 from zipfile import ZipFile
-from datetime import date
+from datetime import date, datetime
+from shutil import ignore_patterns
 import os
 import sys
 import webbrowser
 import shutil
 import json
 import textwrap
+import random
 import requests
 import vdf
 import winreg
+import ctypes
 
 print('============SETUP...============')
 global setup
@@ -32,7 +35,6 @@ if not os.path.isdir(meb_folder):
         sg.Window("There is no Minskworks folder", [[sg.Text(f"{ms_lls_path} not found :/")]]).read()
         sys.exit()
 
-
     try:
         urllib.request.urlretrieve('https://raw.githubusercontent.com/MeblIkea/Water-Launcher/main/logo.ico',
                                    rf'{meb_folder}\icon.ico')
@@ -44,6 +46,9 @@ if not os.path.isdir(meb_folder):
     with open(rf'{meb_folder}\settings.json', 'w') as file:
         settings = {'lls_dir': None, 'theme': 'DarkBlue'}
         json.dump(settings, file)
+
+    os.mkdir(rf'{meb_folder}\saves')
+    os.mkdir(rf'{meb_folder}\temp')
 else:
     meb_folder = meb_folder + r'\LandlordsSuper'
     with open(rf'{meb_folder}\settings.json', 'r') as file:
@@ -58,26 +63,27 @@ else:
             urlerror = sg.Window('Error', [[sg.Text('urllib error: Maybe certificate error')]])
             urlerror.read()
 
+    if not os.path.isdir(meb_folder + r'\saves'):
+        os.mkdir(rf'{meb_folder}\saves')
+    if not os.path.isdir(meb_folder + r'\temp'):
+        os.mkdir(rf'{meb_folder}\temp')
+
 # Set some settings
 sg.theme(settings.get('theme'))
 sg.SetGlobalIcon(rf'{meb_folder}\icon.ico')
 print('Settings loaded\nTheme set\nGetting Latest info')
 info = requests.get('https://pastebin.com/raw/YyDne6X9').json()
-version = "1.0.2"
+version = "1.0.3-BETA"
+illegals_characters = ["/", ":", "?", "*", "?", '"', ">", "<", "|", '\\', "."]
 today = date.today()
 win_y = 209
+hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
+steam_name = winreg.QueryValueEx(hkcu_steam, "LastGameNameUsed")[0]
 print(f'Latest: {info.get("version")}, Current: {version}')
-
-# Setup Layout & Setup
-setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press default if not changed)")],
-                [sg.Input('', enable_events=True, size=55, key='Directory'), sg.FolderBrowse()],
-                [sg.Button('Default'), sg.Text("This directory don't exist", key='Dir_adv', text_color='red')],
-                [sg.Button('Set', disabled=True, key='Set'), sg.Button('Close')]]
 
 
 def find_steam_lls():  # Thanks to WolfWings#2374 for this part
     lls_dir = None
-    hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
     steampath, steampathtype = winreg.QueryValueEx(hkcu_steam, "SteamPath")
     winreg.CloseKey(hkcu_steam)
     if steampathtype == winreg.REG_SZ:
@@ -92,6 +98,30 @@ def find_steam_lls():  # Thanks to WolfWings#2374 for this part
                                        "Landlord's Super")
     return lls_dir
 
+
+def get_perms():
+    if not ctypes.windll.shell32.IsUserAnAdmin():
+        print('Not enough privileges, restarting...')
+        import sys
+        ctypes.windll.shell32.ShellExecuteW(
+            None, 'runas', sys.executable, ' '.join(sys.argv), None, None)
+        exit(0)
+    else:
+        print('Elevated privilege acquired')
+
+
+def check_if_chars_in_string(chars: list, string: str):
+    for char in chars:
+        if char in string:
+            return True
+    return False
+
+
+# Setup Layout & Setup
+setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press default if not changed)")],
+                [sg.Input('', enable_events=True, size=55, key='Directory'), sg.FolderBrowse()],
+                [sg.Button('Default'), sg.Text("This directory don't exist", key='Dir_adv', text_color='red')],
+                [sg.Button('Set', disabled=True, key='Set'), sg.Button('Close')]]
 
 if settings.get('lls_dir') is None:
     print('Launching Setup')
@@ -162,11 +192,28 @@ for x in mods:
     else:
         mods_installed.append([x, 'No'])
 
-# Menus
 
+# Saves
+
+
+def get_saves():
+    print("Saves: ")
+    saves = []
+    for save in os.listdir(meb_folder + r"\saves"):
+        save_file = meb_folder + r'\saves' + fr'\{save}'
+        saves.append([save, str(datetime.fromtimestamp(os.path.getctime(save_file))).split(' ')[0]])
+        print("| " + save + f" - {str(datetime.fromtimestamp(os.path.getctime(save_file))).split(' ')[0]}")
+    return saves
+
+
+# Menus
 if version == info.get('version'):
     stbar = sg.Text('')
     print('Menu is updated')
+elif int(version.split("-")[0].replace(".", "")) > int(info.get('version').split("-")[0].replace(".", "")):
+    stbar = sg.StatusBar(f'You are using {version}.', text_color='green')
+    win_y += 18
+    print(f"Under beta version")
 else:
     stbar = sg.StatusBar(f'*OUTDATED* Current version: {version}, Latest version: {info.get("version")}',
                          text_color='red', enable_events=True, key='outdated_clicked')
@@ -179,7 +226,20 @@ mod_browser = [
      sg.Col([[sg.Text('Selected:')],
              [sg.Text('None', key='Selected_label')],
              [sg.Button('Description', key='Mod_description', disabled=True)],
-             [sg.Button('Install', key='Mod_install', disabled=True)]])]]
+             [sg.Button('Install', key='Mod_install', disabled=True)]])]
+]
+
+saves_browser = [
+    [sg.Col([
+        [sg.Table(get_saves(), ['Save name', 'Date'], auto_size_columns=True, enable_events=True,
+                  key='Saves_list', select_mode=TABLE_SELECT_MODE_BROWSE, justification='left')]]),
+        sg.Col([[sg.Button("Load Save", key="load_save", disabled=True), sg.Button("Delete Save", key="delete_save",
+                                                                                   disabled=True)],
+                [sg.Button("Save Current", key="save_now"), sg.Button("Save Info", key="info_save", disabled=True)],
+                [sg.Button("Save Current", key="save_now_s", visible=False), sg.pin(sg.Text(""))],
+                [sg.Button("Export Save", key="export_save", disabled=True), sg.Button("Import save", key="save_import",
+                                                                                       )]])]
+]
 
 if info.get('version') != version:
     update_scroll = ['Updates', ['Open updates manager']]
@@ -188,9 +248,9 @@ else:
 mod_manager = [[sg.MenubarCustom([['Main', ['Play!', 'Manage Themes', 'Reset this software', 'Exit']],
                                   ['About', ["Minskworks Discord", "Moojuiceman's Repo", 'Water Launcher Repo']],
                                   update_scroll])],
-               [sg.TabGroup([[sg.Tab('Main Mod', install_mod), sg.Tab('Browser Mods', mod_browser,
-                                                                      key='Browse-mod_tab')]],
-                            size=(480, 130))],
+               [sg.TabGroup([[sg.Tab('Main Mod', install_mod), sg.Tab('Browser Mods', mod_browser, key='Browse-mod_tab'
+                                                                      ),
+                              sg.Tab('Saves', saves_browser)]], size=(480, 130))],
                [stbar]]
 
 window = sg.Window('Water Launcher!', mod_manager, default_element_size=(12, 1), size=(500, win_y))
@@ -208,8 +268,9 @@ while True:
     # Game tab
     if event == 'Reset this software':
         shutil.rmtree(os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\Meb'))
-        rs_software = sg.Window('Software has been reset!', [[sg.Text('This software has been reset.')],
-                                                             [sg.Text('You can close this window!')]],
+        rs_software = sg.Window('Software has been reset!',
+                                [[sg.Text('This software has been reset.')],
+                                 [sg.Text('You can close this window!')]],
                                 size=(200, 75))
         rs_software.read()
         rs_software.close()
@@ -220,14 +281,15 @@ while True:
     # Updates manager
     if event == 'outdated_clicked' or event == 'Open updates manager':
         installer_layout = [[sg.Text('How to update:')], [sg.Button('Project Page', key='repo')], [sg.Button('Close')]]
-        installer_window = sg.Window('Updates', installer_layout, size=(250, 100))
+        installer_window = sg.Window('Updates', installer_layout, size=(250, 100), no_titlebar=True)
         while True:
-            event, values = installer_window.read()
+            installer_event = installer_window.read()
+            print(installer_event)
 
-            if event == sg.WIN_CLOSED or event == 'Close':
+            if installer_event[0] == 'Close':
                 installer_window.close()
                 break
-            if event == 'repo':
+            if installer_event == 'repo':
                 webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
 
     # Change theme
@@ -331,6 +393,185 @@ while True:
         mods_installed = nmods_installed
         window['Mods_list'].update(mods_installed)
 
+    # Saves
+
+    if (event == "save_now" and len(values.get("Saves_list")) == 0) or event == "save_now_s":
+        save_name = ""
+        save_error = ""
+        while \
+                check_if_chars_in_string(illegals_characters, save_name) or save_name in os.listdir(
+                    meb_folder + r"\saves") or save_name == "":
+            nwindow = sg.Window("Save name", [[sg.Text("Save Name:  "), sg.Input(key="save_name"), sg.Button("Ok"),
+                                               sg.Button("Close")],
+                                              [sg.Text("Description:  "), sg.Input(key="desc_inp")],
+                                              [sg.StatusBar(save_error, text_color="red")]], no_titlebar=True)
+
+            nvalues, nevent = nwindow.read()
+            save_name = nevent.get("save_name")
+
+            if nvalues == "Close":
+                nwindow.close()
+                break
+
+            if save_name in os.listdir(meb_folder + r"\saves"):
+                save_error = "Save name already exist"
+            elif check_if_chars_in_string(illegals_characters, save_name):
+                save_error = "Illegal character"
+            elif save_name == "":
+                save_error = "Save name can't be empty"
+            else:
+                save_error = ""
+
+                if "saves.json" in os.listdir(ms_lls_path):
+                    with open(rf'{ms_lls_path}/saves.json', 'r') as infos:
+                        info_json = json.load(infos)
+                        if steam_name not in info_json.get('author'):
+                            authors = f"{info_json.get('author')} & {steam_name}"
+                        else:
+                            authors = info_json.get('author')
+                else:
+                    authors = steam_name
+
+                shutil.copytree(ms_lls_path, meb_folder + rf"\saves\{save_name}",
+                                ignore=ignore_patterns("SavedSettings.txt"))
+
+                save_details = {"save_name": save_name, "author": authors,
+                                "time": str(datetime.fromtimestamp(os.path.
+                                                                   getctime(meb_folder + rf"\saves\{save_name}"))
+                                            ).split(' ')[0],
+                                "desc": nevent.get("desc_inp")}
+                with open(ms_lls_path + rf"\saves.json", 'w') as save_detail:
+                    json.dump(save_details, save_detail)
+                with open(meb_folder + rf"\saves\{save_name}\saves.json", 'w') as save_detail:
+                    json.dump(save_details, save_detail)
+                window["Saves_list"].update(get_saves())
+
+                nwindow.close()
+                break
+
+    if event == "save_import":
+        import_window = sg.Window("Import Save",
+                                  [[sg.Text("Click browse to select a ZIP file of your save.")],
+                                   [sg.FileBrowse(file_types=[("Zip File", "*.zip")],
+                                                  initial_folder=os.path.join(os.environ['USERPROFILE'], "desktop"),
+                                                  enable_events=True)]])
+
+        ievent, ivalues = import_window.read()
+
+        if ievent == "Browse":
+            file_name = ivalues["Browse"].split(r'/')[-1]
+            os.rename(ivalues["Browse"], os.path.join(meb_folder, "temp", file_name))
+            with ZipFile(os.path.join(meb_folder, "temp", file_name), 'r') as zipfile:
+                zipfile.extractall(os.path.join(meb_folder, "temp"))
+
+            if file_name.split(".zip")[0] in os.listdir(os.path.join(meb_folder, "saves")):
+                os.rename(os.path.join(meb_folder, "temp", file_name.split(".zip")[0]),
+                          os.path.join(meb_folder, "saves", f"{file_name.split('.zip')[0]} ({random.randint(0, 1000)})"))
+            else:
+                os.rename(os.path.join(meb_folder, "temp", file_name.split(".zip")[0]),
+                          os.path.join(meb_folder, "saves", file_name.split(".zip")[0]))
+
+            shutil.rmtree(os.path.join(meb_folder, "temp"))
+            os.mkdir(os.path.join(meb_folder, "temp"))
+            window["Saves_list"].update(get_saves())
+        import_window.close()
+
+    if len(values.get("Saves_list")) != 0:
+        if event == "save_now":
+            confirm_window = sg.Window("", [[sg.Text("Are you sure you want to save your game on this save")],
+                                            [sg.Button("Yes"), sg.Button("No")]], no_titlebar=True)
+
+            cevent = confirm_window.read()
+
+            if cevent[0] == "Yes":
+                save_name = get_saves()[values.get('Saves_list')[0]][0]
+
+                with open(meb_folder + rf"\saves\{save_name}\saves.json", 'r') as nsave_file:
+
+                    desc_file = json.load(nsave_file)
+                    if steam_name not in desc_file.get('author'):
+                        desc_file["author"] = f"{desc_file.get('author')} & {steam_name}"
+
+                    nsave_file.close()
+
+                    shutil.rmtree(meb_folder + rf"\saves\{save_name}")
+                    shutil.copytree(ms_lls_path, meb_folder + rf"\saves\{save_name}",
+                                    ignore=ignore_patterns("SavedSettings.txt"))
+                with open(meb_folder + rf"\saves\{save_name}\saves.json", 'w') as save_detail:
+                    json.dump(desc_file, save_detail)
+                window["Saves_list"].update(get_saves())
+
+            confirm_window.close()
+
+        if event == "info_save":
+            with open(os.path.join(meb_folder, rf"saves\{get_saves()[values.get('Saves_list')[0]][0]}\saves.json"),
+                      'r') as info_file:
+                info = json.load(info_file)
+
+            info_window = sg.Window("", [[sg.Text("Save Name: "), sg.Text(info.get("save_name"))],
+                                         [sg.Text("Author(s): "), sg.Text(info.get("author"))],
+                                         [sg.Text("Date: "), sg.Text(info.get("time"))],
+                                         [sg.Text("Description: "), sg.Text(info.get('desc'))],
+                                         [sg.Button("Ok")]], no_titlebar=True)
+            info_window.read()
+            info_window.close()
+
+        if event == "export_save":
+            shutil.make_archive(os.path.join(os.environ['USERPROFILE'] + r'\Desktop',
+                                             get_saves()[values.get("Saves_list")[0]][0]),
+                                format="zip",
+                                root_dir=meb_folder + r"\saves",
+                                base_dir=get_saves()[values.get("Saves_list")[0]][0])
+            export_windows = sg.Window("", [[sg.Text("Your save file has been zipped.\nCheck your desktop")],
+                                            [sg.Button("Ok")]], no_titlebar=True, keep_on_top=True)
+            export_windows.read()
+            export_windows.close()
+
+        if event == "delete_save":
+            warning_window = sg.Window("", [[sg.Text("Are you sure you want to delete this save?")],
+                                            [sg.Button("Yes"), sg.Button('No')]], no_titlebar=True,
+                                       keep_on_top=True)
+            wevent = warning_window.read()
+
+            if wevent[0] == "Yes":
+                shutil.rmtree(os.path.join(meb_folder + r"\saves", get_saves()[values.get("Saves_list")[0]][0]))
+                window["Saves_list"].update(get_saves())
+            warning_window.close()
+
+        if event == "load_save":
+            warning_window = sg.Window("", [[sg.Text("Are you sure you want to load this save?\n"
+                                                     "It will remove the currents save files of Landlord's Super")],
+                                            [sg.Button("Yes"), sg.Button('No')]], no_titlebar=True,
+                                       keep_on_top=True)
+            wevent = warning_window.read()
+
+            if wevent[0] == "Yes":
+                with open(os.path.join(ms_lls_path, "SavedSettings.txt"), 'r') as settings_file:
+                    lls_settings = settings_file.read()
+
+                shutil.rmtree(ms_lls_path)
+                shutil.copytree(os.path.join(meb_folder + r"\saves", get_saves()[values.get("Saves_list")[0]][0]),
+                                ms_lls_path, ignore=ignore_patterns("SavedSettings.txt"))
+
+                with open(os.path.join(ms_lls_path, "SavedSettings.txt"), "w") as settings_file:
+                    settings_file.write(lls_settings)
+
+            warning_window.close()
+
+        window["load_save"].update(disabled=False)
+        window["delete_save"].update(disabled=False)
+        window["info_save"].update(disabled=False)
+        window["export_save"].update(disabled=False)
+        window["save_now_s"].update(visible=True)
+        window["save_now"].update("Quick save")
+    else:
+        window["load_save"].update(disabled=True)
+        window["delete_save"].update(disabled=True)
+        window["info_save"].update(disabled=True)
+        window["export_save"].update(disabled=True)
+        window["save_now_s"].update(visible=False)
+        window["save_now"].update("Save Current")
+
     # Info
     if event == 'Minskworks Discord':
         webbrowser.open('https://discord.gg/A253AkJ2qv')
@@ -338,4 +579,3 @@ while True:
         webbrowser.open('https://github.com/orgs/Moojuiceman-LSMods/repositories')
     if event == 'Mod Manager Repo':
         webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
- 
