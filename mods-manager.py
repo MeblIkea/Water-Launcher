@@ -75,24 +75,6 @@ setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press defa
                 [sg.Button('Set', disabled=True, key='Set'), sg.Button('Close')]]
 
 
-def find_steam_lls():  # Thanks to WolfWings#2374 for this part
-    lls_dir = None
-    hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
-    steampath, steampathtype = winreg.QueryValueEx(hkcu_steam, "SteamPath")
-    winreg.CloseKey(hkcu_steam)
-    if steampathtype == winreg.REG_SZ:
-        games_path = open(os.path.join(steampath, 'config', 'libraryfolders.vdf'))
-
-        libraryfolders = vdf.load(games_path)
-        print(libraryfolders)
-
-        for key in libraryfolders['libraryfolders']:
-            if '1127840' in libraryfolders['libraryfolders'][key]['apps']:
-                lls_dir = os.path.join(libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common',
-                                       "Landlord's Super")
-    return lls_dir
-
-
 if settings.get('lls_dir') is None:
     print('Launching Setup')
     setup = sg.Window('Setup', setup_layout, size=(480, 160))
