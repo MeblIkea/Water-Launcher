@@ -1,9 +1,11 @@
 import PySimpleGUI as sg
 from PySimpleGUI import TABLE_SELECT_MODE_BROWSE
 import urllib.request
+import urllib.error
 from urllib.request import urlopen
 from io import BytesIO
 from zipfile import ZipFile
+from datetime import date
 import os
 import sys
 import webbrowser
@@ -19,28 +21,52 @@ global setup
 
 # Get settings
 meb_folder = os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\Meb')
+ms_lls_path = os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\LandlordsSuper')
 if not os.path.isdir(meb_folder):
-    print('Settings not founded, creating settings')
-    os.mkdir(meb_folder)
-    meb_folder = meb_folder + r'\LandlordsSuper'
-    os.mkdir(meb_folder)
-    urllib.request.urlretrieve('https://raw.githubusercontent.com/MeblIkea/Water-Launcher/main/logo.ico',
-                               rf'{meb_folder}\icon.ico')
+    try:
+        print('Settings not founded, creating settings')
+        os.mkdir(meb_folder)
+        meb_folder = meb_folder + r'\LandlordsSuper'
+        os.mkdir(meb_folder)
+    except FileNotFoundError:
+        sg.Window("There is no Minskworks folder", [[sg.Text(f"{ms_lls_path} not found :/")]]).read()
+        sys.exit()
+
+
+    try:
+        urllib.request.urlretrieve('https://raw.githubusercontent.com/MeblIkea/Water-Launcher/main/logo.ico',
+                                   rf'{meb_folder}\icon.ico')
+    except urllib.error.URLError:
+        os.rmdir(meb_folder)
+        urlerror = sg.Window('Error', [[sg.Text('urllib error: Maybe certificate error')]])
+        urlerror.read()
+
     with open(rf'{meb_folder}\settings.json', 'w') as file:
-        settings = {'lls_dir': None, 'theme': 'DefaultNoMoreNagging'}
+        settings = {'lls_dir': None, 'theme': 'DarkBlue'}
         json.dump(settings, file)
 else:
     meb_folder = meb_folder + r'\LandlordsSuper'
     with open(rf'{meb_folder}\settings.json', 'r') as file:
         settings = json.load(file)
+    # Check if everything is in order
+    if not os.path.isfile(meb_folder + r'\icon.ico'):
+        try:
+            urllib.request.urlretrieve('https://raw.githubusercontent.com/MeblIkea/Water-Launcher/main/logo.ico',
+                                       rf'{meb_folder}\icon.ico')
+        except urllib.error.URLError:
+            os.rmdir(meb_folder)
+            urlerror = sg.Window('Error', [[sg.Text('urllib error: Maybe certificate error')]])
+            urlerror.read()
 
+# Set some settings
 sg.theme(settings.get('theme'))
 sg.SetGlobalIcon(rf'{meb_folder}\icon.ico')
 print('Settings loaded\nTheme set\nGetting Latest infos')
 infos = requests.get('https://pastebin.com/raw/YyDne6X9').json()
 version = "1.2.0"
+today = date.today()
 win_y = 209
-print(f'Latest: {infos.get("version")}, Current: {version}')
+print(f'Latest: {info.get("version")}, Current: {version}')
 
 # Setup Layout & Setup
 setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press default if not changed)")],
@@ -143,11 +169,11 @@ for x in mods:
 
 # Menus
 
-if version == infos.get('version'):
+if version == info.get('version'):
     stbar = sg.Text('')
     print('Menu is updated')
 else:
-    stbar = sg.StatusBar(f'*OUTDATED* Current version: {version}, Latest version: {infos.get("version")}',
+    stbar = sg.StatusBar(f'*OUTDATED* Current version: {version}, Latest version: {info.get("version")}',
                          text_color='red', enable_events=True, key='outdated_clicked')
     win_y += 18
     print('Menu is outdated')
@@ -160,8 +186,13 @@ mod_browser = [
              [sg.Button('Description', key='Mod_description', disabled=True)],
              [sg.Button('Install', key='Mod_install', disabled=True)]])]]
 
-mod_manager = [[sg.MenubarCustom([['Main', ['Play!', 'Reset this software', 'Exit']], ['Themes', ['Manage Themes']],
-                                  ['About', ["Minskworks Discord", "Moojuiceman's Repo", 'Water Launcher Repo']]])],
+if info.get('version') != version:
+    update_scroll = ['Updates', ['Open updates manager']]
+else:
+    update_scroll = [' ', [' ']]
+mod_manager = [[sg.MenubarCustom([['Main', ['Play!', 'Manage Themes', 'Reset this software', 'Exit']],
+                                  ['About', ["Minskworks Discord", "Moojuiceman's Repo", 'Water Launcher Repo']],
+                                  update_scroll])],
                [sg.TabGroup([[sg.Tab('Main Mod', install_mod), sg.Tab('Browser Mods', mod_browser,
                                                                       key='Browse-mod_tab')]],
                             size=(480, 130))],
@@ -182,8 +213,8 @@ while True:
     # Game tab
     if event == 'Reset this software':
         shutil.rmtree(os.getenv('APPDATA').replace('Roaming', r'LocalLow\Minskworks\Meb'))
-        rs_software = sg.Window('Software has been resetted!', [[sg.Text('This software has been resetted.')],
-                                                                [sg.Text('You can close this window!')]],
+        rs_software = sg.Window('Software has been reset!', [[sg.Text('This software has been reset.')],
+                                                             [sg.Text('You can close this window!')]],
                                 size=(200, 75))
         rs_software.read()
         rs_software.close()
@@ -191,16 +222,26 @@ while True:
     if event == 'Play!':
         os.popen(rf'{settings.get("lls_dir")}\LandlordsSuper.exe')
 
-    # If outdated clicked
-    if event == 'outdated_clicked':
-        webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
+    # Updates manager
+    if event == 'outdated_clicked' or event == 'Open updates manager':
+        installer_layout = [[sg.Text('How to update:')], [sg.Button('Project Page', key='repo')], [sg.Button('Close')]]
+        installer_window = sg.Window('Updates', installer_layout, size=(250, 100))
+        while True:
+            event, values = installer_window.read()
+
+            if event == sg.WIN_CLOSED or event == 'Close':
+                installer_window.close()
+                break
+            if event == 'repo':
+                webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
+
     # Change theme
     if event == 'Manage Themes':
         theme_layout = [[sg.Text('Put your theme name here:')],
                         [sg.Input('', key='Theme_input')],
                         [sg.Button('Set theme'), sg.Button('List themes'), sg.Text('', key='Theme_error')],
-                        [sg.Button('Close')]]
-        theme_window = sg.Window('Theme selector', theme_layout, size=(480, 130))
+                        [sg.Button('Close'), sg.Button('Exit', key='Theme_exit')]]
+        theme_window = sg.Window('Theme selector', theme_layout, size=(400, 130))
         while True:
             values: object
             event, values = theme_window.read()
@@ -211,11 +252,14 @@ while True:
                     with open(rf'{meb_folder}\settings.json', 'w') as file:
                         settings = {'lls_dir': settings.get('lls_dir'), 'theme': theme_window['Theme_input'].get()}
                         json.dump(settings, file)
-                    theme_window['Theme_error'].update("Theme set, now you can close the window", text_color='lime')
+                    theme_window['Theme_error'].update("Theme set, now you click Exit", text_color='lime')
+                    theme_window['Theme_exit'].update(button_color='green')
                 else:
                     theme_window['Theme_error'].update("This theme don't exist", text_color='red')
             if event == sg.WIN_CLOSED or event == 'Close':
                 theme_window.close()
+                break
+            if event == 'Theme_exit':
                 sys.exit()
     # Install mod
     if event == 'Mod_install':
@@ -233,23 +277,26 @@ while True:
             mods_installed[values.get('Mods_list')[0]] = [mod_name, 'No']
         window['Mods_list'].update(mods_installed)
     # Selected mod
-    if len(values.get('Mods_list')) != 0:
-        mod_name = mods_installed[values.get('Mods_list')[0]][0]
-        window['Selected_label'].update(mod_name)
-        if main_mod_install is True:
-            window['Mod_install'].update(disabled=False)
-            window['Mod_description'].update(disabled=False)
-            if mods_installed[values.get('Mods_list')[0]][1] == 'Yes':
-                window['Mod_install'].update('Remove')
-            else:
-                window['Mod_install'].update('Install')
-        window.set_title('Mods Manager')
+    try:
+        if len(values.get('Mods_list')) != 0:
+            mod_name = mods_installed[values.get('Mods_list')[0]][0]
+            window['Selected_label'].update(mod_name)
+            if main_mod_install is True:
+                window['Mod_install'].update(disabled=False)
+                window['Mod_description'].update(disabled=False)
+                if mods_installed[values.get('Mods_list')[0]][1] == 'Yes':
+                    window['Mod_install'].update('Remove')
+                else:
+                    window['Mod_install'].update('Install')
+            window.set_title('Mods Manager')
+    except TypeError:
+        pass
     if event == 'Mod_description':
         mod_name = mods_installed[values.get('Mods_list')[0]][0]
         description_window = sg.Window('Description', [[sg.Text(mod_name)],
                                                        [sg.Text(mods.get(mod_name).get('description'),
                                                                 size=(350, 150), auto_size_text=True)]],
-                                       size=(350, 250))
+                                       size=(350, 45 + len(mods.get(mod_name).get('description').split('\n')) * 16))
         description_window.read()
     # Install main mod
     if event == 'Install_main_mod':
@@ -288,10 +335,12 @@ while True:
             nmods_installed.append([x[0], 'No'])
         mods_installed = nmods_installed
         window['Mods_list'].update(mods_installed)
-    # Infos
+
+    # Info
     if event == 'Minskworks Discord':
         webbrowser.open('https://discord.gg/A253AkJ2qv')
     if event == "Moojuiceman's Repo":
         webbrowser.open('https://github.com/orgs/Moojuiceman-LSMods/repositories')
     if event == 'Mod Manager Repo':
         webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
+ 
