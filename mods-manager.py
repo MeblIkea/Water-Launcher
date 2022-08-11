@@ -32,7 +32,6 @@ if not os.path.isdir(meb_folder):
         sg.Window("There is no Minskworks folder", [[sg.Text(f"{ms_lls_path} not found :/")]]).read()
         sys.exit()
 
-
     try:
         urllib.request.urlretrieve('https://raw.githubusercontent.com/MeblIkea/Water-Launcher/main/logo.ico',
                                    rf'{meb_folder}\icon.ico')
@@ -62,8 +61,8 @@ else:
 sg.theme(settings.get('theme'))
 sg.SetGlobalIcon(rf'{meb_folder}\icon.ico')
 print('Settings loaded\nTheme set\nGetting Latest infos')
-infos = requests.get('https://pastebin.com/raw/YyDne6X9').json()
-version = "1.2.0"
+info = requests.get('https://pastebin.com/raw/YyDne6X9').json()
+version = "1.0.2"
 today = date.today()
 win_y = 209
 print(f'Latest: {info.get("version")}, Current: {version}')
@@ -74,18 +73,21 @@ setup_layout = [[sg.Text("Put bellow your Landlord's Super directory (press defa
                 [sg.Button('Default'), sg.Text("This directory don't exist", key='Dir_adv', text_color='red')],
                 [sg.Button('Set', disabled=True, key='Set'), sg.Button('Close')]]
 
+
 def find_steam_lls():
     lls_dir = None
     _hkcu_steam = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
-    _steampath, _steampathtype = winreg.QueryValueEx( _hkcu_steam, "SteamPath" )
-    winreg.CloseKey( _hkcu_steam )
+    _steampath, _steampathtype = winreg.QueryValueEx(_hkcu_steam, "SteamPath")
+    winreg.CloseKey(_hkcu_steam)
     if _steampathtype == winreg.REG_SZ:
-        _lfvdf = open( os.path.join( _steampath, 'config', 'libraryfolders.vdf' ) )
-        _libraryfolders = vdf.parse( _lfvdf )
+        _lfvdf = open(os.path.join(_steampath, 'config', 'libraryfolders.vdf'))
+        _libraryfolders = vdf.parse(_lfvdf)
         for key in _libraryfolders['libraryfolders']:
             if '1127840' in _libraryfolders['libraryfolders'][key]['apps']:
-                lls_dir = os.path.join( _libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common', "Landlord's Super")
+                lls_dir = os.path.join(_libraryfolders['libraryfolders'][key]['path'], 'steamapps', 'common',
+                                       "Landlord's Super")
     return lls_dir
+
 
 # Don't prompt for the directory if the Steam Library scan works, cleaner startup
 if settings.get('lls_dir') is None:
@@ -343,4 +345,3 @@ while True:
         webbrowser.open('https://github.com/orgs/Moojuiceman-LSMods/repositories')
     if event == 'Mod Manager Repo':
         webbrowser.open('https://github.com/MeblIkea/Water-Launcher')
- 
