@@ -1,24 +1,24 @@
 <h1> Water Launcher! </h1>
 
-This is a simple software for managing Landlord's Super mods <a href="https://github.com/Moojuiceman-LSMods">Moojuiceman's mods</a>, so this is <b>NOT</b> my mods.
+This is a simple software in order to manage <a href="https://github.com/Moojuiceman-LSMods">Moojuiceman's mods</a>. These are none of my mods.
 <br>
 This is a portable software.
-In case of any problems, please go to <a href="https://discord.gg/A253AkJ2qv">Minskworks Discord</a> to report it.
+If you find an issue, report it on this GitHub page or join <a href="https://discord.gg/A253AkJ2qv">Minskworks Discord</a> to report it.
 #### <b> LANDLORD'S SUPER STEAM EDITION IS REQUIRED </b>
 
 <img src="https://cdn.discordapp.com/attachments/897896186487390218/986285826189193267/unknown.png">
 <h2> Installation </h2>
 Click on the latest release <a href="https://github.com/MeblIkea/Landlords-Super-Mod-Manager/releases">(or here)</a>
 <br>
-Then click on <a href="https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.exe">Water.Launcher.exe</a> for downloading it
+Then click on <a href="https://github.com/MeblIkea/Water-Launcher/releases/latest/download/Water-Launcher.exe">Water.Launcher.exe</a> to download it.
 
-Now, you can launch it.<br>
-/!\ Windows can detect the new version as a virus (I can't do nothing about it :'( )
+Then, you can launch it.<br>
+/!\ Windows can detect the new version as a virus (and I can't do anything about it :'( )
 
 <h2> Setup </h2>
-When you see the setup window, you have to put your Landlord's Super directory (press "Default" if it is always in default Steam location)
+When you see the setup window, you have to enter your Landlord's Super directory (press "Default" if it's in the default Steam location)
 <br>
-<i>If it say "This directory exist, and is Landlord's Super", then you can click "Set". Else, you have to get the good Landlord's Super location.</i>
+<i>If it reads "This directory exist, and is Landlord's Super", then you can click "Set". Else, you will have to get the proper Landlord's Super location.</i>
 
 <h2> Customisation </h2>
 If you want to change the theme, you can click "Themes" > "Set themes".
@@ -27,7 +27,7 @@ Click "List themes" for see every theme you can have, then keep the name of your
 <br>
 Close the list themes window, and put the name of your theme in the input.
 <br>
-Click "set themes", close and re-open the software, and it's good.
+Click "set themes", close and re-open the software, and it should be all good.
 
 <h2> Installing the main mod </h2>
 <i> For every mods can work, you have to install a <a href="https://github.com/BepInEx/BepInEx"> main mod </a> (it's automatically installed).</i>
@@ -54,6 +54,6 @@ Click "Browse mods", and then, you can see every mod for Landlord's Super, and y
 | Windows 7 (x86)  | No                                                                                                                                                                                                                                                  | 1.0.2             | SSL Certificat Error                 |
 | Windows XP (x64) | No                                                                                                                                                                                                                                                  | 1.0.1             | Couldn't locate library COMCTL32.dll |
 
-(all these tests are made with fresh installations, without having Python installed)
+(all these tests were made with a fresh installation, without having Python installed)
 <br></br>
 ### Also, sorry for spelling and grammar mistakes, my English is kinda bad, have fun ^^
