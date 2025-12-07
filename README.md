@@ -20,6 +20,11 @@ When you see the setup window, you have to enter your Landlord's Super directory
 <br>
 <i>If it reads "This directory exist, and is Landlord's Super", then you can click "Set". Else, you will have to get the proper Landlord's Super location.</i>
 
+<h2>Build it yourself</h2>
+Get <a href="https://www.python.org/downloads/">Python</a>.
+Install the requirements with `pip install -r requirements.txt`
+Launch the main with `python mods-manager.py`
+
 <h2> Customisation </h2>
 If you want to change the theme, you can click "Themes" > "Set themes".
 <br>
@@ -55,5 +60,3 @@ Click "Browse mods", and then, you can see every mod for Landlord's Super, and y
 | Windows XP (x64) | No                                                                                                                                                                                                                                                  | 1.0.1             | Couldn't locate library COMCTL32.dll |
 
 (all these tests were made with a fresh installation, without having Python installed)
-<br></br>
-### Also, sorry for spelling and grammar mistakes, my English is kinda bad, have fun ^^
