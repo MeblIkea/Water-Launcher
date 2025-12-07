@@ -21,8 +21,8 @@ When you see the setup window, you have to enter your Landlord's Super directory
 <i>If it reads "This directory exist, and is Landlord's Super", then you can click "Set". Else, you will have to get the proper Landlord's Super location.</i>
 
 <h2>Build it yourself</h2>
-Get <a href="https://www.python.org/downloads/">Python</a>.
-Install the requirements with `pip install -r requirements.txt`
+Get <a href="https://www.python.org/downloads/">Python</a>.<br>
+Install the requirements with `pip install -r requirements.txt`<br>
 Launch the main with `python mods-manager.py`
 
 <h2> Customisation </h2>
